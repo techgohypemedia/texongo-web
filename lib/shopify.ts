@@ -30,6 +30,7 @@ export async function shopifyFetch<T>({
           'X-Shopify-Storefront-Access-Token': publicAccessToken,
         },
         body: JSON.stringify({ query, variables }),
+        cache: 'no-store',
       }
     );
 

@@ -15,7 +15,7 @@ export default async function HomePage() {
     link: `/blog/${article.blogHandle}/${article.handle}`
   }));
 
-  const collections = await getShopifyCollections(50);
+  const collections = await getShopifyCollections(250);
 
   return <HomeExperience products={products} blogs={blogs} newArrivals={newArrivalsCollection?.products} collections={collections} />;
 }

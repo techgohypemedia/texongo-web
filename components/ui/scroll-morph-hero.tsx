@@ -349,10 +349,22 @@ function buildCategoryCards(
     labels.forEach((name, index) => {
         const product = findProductForCategory(products, name, kind);
         
-        const collection = collections?.find(c => 
-            c.title.toLowerCase() === name.toLowerCase() || 
-            c.handle === name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
-        );
+        const collection = collections?.find(c => {
+            const cTitle = c.title.toLowerCase().trim();
+            const nTitle = name.toLowerCase().trim();
+            const cHandle = c.handle.toLowerCase().trim();
+            const nHandle = nTitle.replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+
+            if (cTitle === nTitle || cHandle === nHandle) return true;
+            
+            // Plural/singular matching
+            if (cTitle === nTitle + 's' || cTitle + 's' === nTitle) return true;
+            
+            // Substring mappings
+            if (nTitle === "giza/ egyptian" && cTitle === "giza") return true;
+
+            return false;
+        });
         
         const collectionHandle = collection ? collection.handle : name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
         
