@@ -3,7 +3,7 @@ import { createStorefrontApiClient } from '@shopify/storefront-api-client';
 const domain = process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN || process.env.SHOPIFY_STORE_DOMAIN || '';
 const publicAccessToken = process.env.NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN || process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN || '';
 
-const API_VERSION = '2025-01';
+const API_VERSION = '2026-01';
 
 export const storefrontClient = (domain && publicAccessToken)
   ? createStorefrontApiClient({
