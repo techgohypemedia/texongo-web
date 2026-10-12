@@ -1,9 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap');
 @import "tailwindcss";
 
 @theme inline {
-  --font-sans: var(--font-sans);
+  --font-sans: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   --font-mono: var(--font-geist-mono);
-  --font-display: var(--font-sans);
+  --font-display: 'Roboto', sans-serif;
 }
 
 :root {
@@ -12,6 +13,7 @@
   --brand-green: #57AD43;
   --brand-green-light: #61CE70;
   --text-secondary: #475467;
+  --font-sans: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   --font-display: var(--font-sans);
 }
 

@@ -1,19 +1,10 @@
 import type { Metadata } from "next";
-import { Roboto } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "../components/ui/navbar";
 import { Footer } from "../components/ui/footer";
 import { CartDrawer } from "@/components/ui/cart-drawer";
 import { Preloader } from "../components/ui/preloader";
 import { SmoothScroll } from "../components/ui/smooth-scroll";
-
-
-const roboto = Roboto({
-  subsets: ["latin"],
-  variable: "--font-sans",
-  weight: ["300", "400", "500", "700", "900"],
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: "Texongo Fabrics",
@@ -26,9 +17,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${roboto.variable}`} suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <body
-        className={`${roboto.className} min-h-screen bg-[#F9FAFB] text-[#111111] antialiased`}
+        className="min-h-screen bg-[#F9FAFB] text-[#111111] antialiased"
         suppressHydrationWarning
       >
         <SmoothScroll />

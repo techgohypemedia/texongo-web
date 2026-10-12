@@ -3,6 +3,25 @@
 import nodemailer from "nodemailer";
 
 export async function sendContactEmail(formData: FormData) {
+  // 1. Honeypot check: Bots auto-fill hidden decoy inputs
+  const honeypotCompany = (formData.get("hp_company") as string) || "";
+  const honeypotWebsite = (formData.get("website") as string) || "";
+  if (honeypotCompany.trim() !== "" || honeypotWebsite.trim() !== "") {
+    console.warn("[ANTI-SPAM] Bot caught by honeypot trap. Silently dropped.");
+    // Return success so the bot script believes it worked and does not adapt
+    return { success: true };
+  }
+
+  // 2. Velocity check: Humans take at least 2 seconds to complete the form
+  const formTimestamp = formData.get("_ts");
+  if (formTimestamp) {
+    const elapsedMs = Date.now() - Number(formTimestamp);
+    if (!isNaN(elapsedMs) && elapsedMs > 0 && elapsedMs < 2000) {
+      console.warn(`[ANTI-SPAM] Bot caught by submission velocity (${elapsedMs}ms). Silently dropped.`);
+      return { success: true };
+    }
+  }
+
   const name = formData.get("name") as string;
   const email = formData.get("email") as string;
   const phone = formData.get("phone") as string;
@@ -10,6 +29,12 @@ export async function sendContactEmail(formData: FormData) {
 
   if (!name || !email || !message) {
     return { error: "Name, email, and message are required." };
+  }
+
+  // Basic email structure validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return { error: "Please provide a valid email address." };
   }
 
   try {

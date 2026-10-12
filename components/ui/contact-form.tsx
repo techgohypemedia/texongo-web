@@ -2,12 +2,18 @@
 
 import { Mail, Globe, Phone, MapPin, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { sendContactEmail } from "../../app/actions/send-email";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 
 export function ContactForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
+  const [formLoadedAt, setFormLoadedAt] = useState<number>(0);
+  const formRef = useRef<HTMLFormElement>(null);
+
+  useEffect(() => {
+    setFormLoadedAt(Date.now());
+  }, []);
 
   const fadeIn = {
     initial: { opacity: 0, y: -40 },
@@ -25,6 +31,8 @@ export function ContactForm() {
     setIsSubmitting(false);
     if (result.success) {
       setFeedback({ type: "success", message: "Your message has been sent successfully!" });
+      formRef.current?.reset();
+      setFormLoadedAt(Date.now());
     } else {
       setFeedback({ type: "error", message: result.error || "Something went wrong." });
     }
@@ -41,7 +49,39 @@ export function ContactForm() {
             <h2 className="text-3xl lg:text-5xl font-bold text-black mb-10 tracking-tight">Send a Message</h2>
           </motion.div>
 
-          <form action={handleSubmit} className="space-y-5 text-left">
+          <form ref={formRef} action={handleSubmit} className="space-y-5 text-left">
+            {/* Honeypot Decoy Fields: Hidden from human users, traps automated spambots */}
+            <div
+              aria-hidden="true"
+              style={{
+                position: "absolute",
+                left: "-9999px",
+                top: "-9999px",
+                opacity: 0,
+                height: 0,
+                width: 0,
+                overflow: "hidden",
+                pointerEvents: "none",
+              }}
+            >
+              <label htmlFor="hp_company">Company</label>
+              <input
+                id="hp_company"
+                type="text"
+                name="hp_company"
+                tabIndex={-1}
+                autoComplete="off"
+              />
+              <label htmlFor="website">Website</label>
+              <input
+                id="website"
+                type="text"
+                name="website"
+                tabIndex={-1}
+                autoComplete="off"
+              />
+              <input type="hidden" name="_ts" value={formLoadedAt} />
+            </div>
             <motion.div {...fadeIn} transition={{ delay: 0.1 }} className="space-y-2 relative group">
               <label className="text-[10px] font-black uppercase tracking-widest text-black/40 ml-1">Name</label>
               <input
