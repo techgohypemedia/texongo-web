@@ -478,7 +478,7 @@ export function HomeExperience({ products, blogs, newArrivals, collections }: { 
         {/* ── HERO ─────────────────────────────────────────── */}
         <ScrollExpandMedia
           mediaType="video"
-          mediaSrc="/video/new.mp4"
+          mediaSrc="/Texongohomepagevideo.mp4"
           bgImageSrc={heroImages}
           title="Premium Knits"
           date="Collection 2026"
@@ -511,7 +511,8 @@ export function HomeExperience({ products, blogs, newArrivals, collections }: { 
             <div className="relative z-10 flex flex-col md:flex-row w-full max-w-[1440px] mx-auto">
               <div className="w-full md:w-1/2 relative min-h-[250px] md:min-h-[400px] flex items-center justify-center p-8 lg:p-16">
                 <LazyVideo
-                  src="https://cdn.shopify.com/videos/c/o/v/ebe78b4f20aa4b058686865135442659.webm"
+                  src="/Texon%20Sourcing.mp4"
+                  objectFit="contain"
                   className="w-full h-full object-contain"
                 />
               </div>
