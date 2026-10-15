@@ -209,8 +209,8 @@ export default function CartPage() {
               </button>
 
               <div className="mt-8 pt-8 border-t border-white/5 flex flex-col gap-4">
-                <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.2em] italic text-center leading-relaxed">
-                  Complimentary worldwide shipping applies to all textile orders during launch phase.
+                <p className="text-[10px] font-bold text-white/30 uppercase tracking-[0.15em] text-center leading-relaxed">
+                  Shipping charges (weight-based) and applicable GST (5%) are calculated at checkout.
                 </p>
               </div>
             </div>

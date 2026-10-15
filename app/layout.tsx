@@ -5,6 +5,7 @@ import { Footer } from "../components/ui/footer";
 import { CartDrawer } from "@/components/ui/cart-drawer";
 import { Preloader } from "../components/ui/preloader";
 import { SmoothScroll } from "../components/ui/smooth-scroll";
+import { Analytics } from "@/components/analytics";
 
 export const metadata: Metadata = {
   title: "Texongo Fabrics",
@@ -30,6 +31,7 @@ export default function RootLayout({
           {children}
         </div>
         <Footer />
+        <Analytics />
       </body>
 
     </html>
