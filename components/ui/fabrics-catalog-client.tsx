@@ -335,7 +335,34 @@ export function FabricsCatalogClient({ initialFabrics }: FabricsCatalogClientPro
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Dynamic page heading — follows the selected category / search
+  const headingSpecial: Record<string, string> = {
+    menwear: "Men's Wear",
+    womenwear: "Women's Wear",
+    bci: "BCI Cotton",
+  };
+  const headingText = categoryParam
+    ? headingSpecial[categoryParam.toLowerCase()] ?? formatCategoryName(decodeURIComponent(categoryParam))
+    : queryParam
+      ? `Results for "${queryParam}"`
+      : "Fabrics Catalog";
+  const headingWords = headingText.split(" ");
+  const headingLead = headingWords.length > 1 ? headingWords.slice(0, -1).join(" ") : "";
+  const headingAccent = headingWords[headingWords.length - 1];
+  const headingEyebrow = categoryParam ? "Fabrics Catalog" : queryParam ? "Search" : "Premium Collection";
+
   return (
+    <>
+    {/* Title Header Section */}
+    <div className="max-w-[1680px] mx-auto px-6 lg:px-10 pt-28 md:pt-36 pb-6 relative z-[100]">
+      <div className="flex flex-col items-center gap-4 text-center">
+        <span className="text-[10px] font-black uppercase tracking-[0.4em] text-[#57AD43] mb-1 block">{headingEyebrow}</span>
+        <h1 className="text-3xl md:text-6xl font-bold tracking-tight text-black">
+          {headingLead && <>{headingLead} </>}<span className="text-[#57AD43]">{headingAccent}</span>
+        </h1>
+        <div className="h-px bg-emerald-100/60 w-24 mx-auto mt-4" />
+      </div>
+    </div>
     <div className="max-w-[1680px] mx-auto px-6 lg:px-10 pb-20 relative z-[50]">
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-12 mt-0 md:mt-2">
 
@@ -533,6 +560,7 @@ export function FabricsCatalogClient({ initialFabrics }: FabricsCatalogClientPro
 
       </div>
     </div>
+    </>
   );
 }
 
