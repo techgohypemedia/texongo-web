@@ -113,9 +113,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
       image: product.image
     }, quantity);
   };
-  const liveQuantityText = typeof product.totalInventory === "number"
-    ? `${product.totalInventory} KG AVAILABLE`
-    : "CHECK AVAILABILITY";
+  const stock = typeof product.totalInventory === "number" ? product.totalInventory : undefined;
 
   return (
     <main className="min-h-screen bg-white pb-16 pt-24 lg:pt-44 lg:pb-32">
@@ -205,61 +203,117 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
 
           {/* Right Column: Product Details */}
           <div className="flex flex-col">
-            <div className="space-y-2 mb-6">
-              <p className="text-base font-bold text-black uppercase tracking-widest">SKU: {product.sku || "A1K15126"}</p>
-              <h1 className="!text-[24px] font-bold uppercase text-[#121212] tracking-tight">{product.name}</h1>
+            {/* Breadcrumb */}
+            <nav className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-5">
+              <Link href="/" className="hover:text-[#57AD43] transition-colors">Home</Link>
+              <ChevronRight size={11} />
+              <Link href="/fabrics" className="hover:text-[#57AD43] transition-colors">Fabrics</Link>
+              {product.knit_style && product.knit_style !== "N/A" && (
+                <>
+                  <ChevronRight size={11} />
+                  <Link
+                    href={`/fabrics?category=${product.knit_style.toLowerCase().trim().replace(/\s+/g, "-")}`}
+                    className="hover:text-[#57AD43] transition-colors"
+                  >
+                    {product.knit_style}
+                  </Link>
+                </>
+              )}
+            </nav>
+
+            {/* Title */}
+            <div className="mb-8">
+              <span className="inline-block text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 bg-gray-100 px-3 py-1 rounded-full mb-4">
+                SKU: {product.sku || "N/A"}
+              </span>
+              <h1 className="text-2xl lg:!text-[32px] font-bold uppercase text-[#121212] tracking-tight leading-tight">{product.name}</h1>
+              {product.gsm && product.gsm !== "N/A" && (
+                <p className="mt-3 text-xs font-bold uppercase tracking-widest text-[#57AD43]">
+                  {product.gsm} GSM{product.knit_style && product.knit_style !== "N/A" ? ` · ${product.knit_style}` : ""}
+                </p>
+              )}
             </div>
 
-            {/* Specifications Table */}
-            <div className="space-y-1 mb-8">
-              <SpecRow label="FABRIC" value={product.fabric || "N/A"} />
-              <SpecRow label="KNIT STYLE" value={product.knit_style || "N/A"} />
-              <SpecRow label="CONTENT" value={product.content || product.composition || "N/A"} />
-              <SpecRow label="GSM" value={product.gsm === "N/A" ? "N/A" : `${product.gsm} g/m²`} />
-              <SpecRow label="WIDTH" value={product.width !== "N/A" ? `${product.width}` : "N/A"} />
-              <SpecRow label="WIDTH TYPE" value={product.type || "N/A"} />
-              <SpecRow label="SHADE" value={product.shade || "N/A"} />
-              <SpecRow label="USAGE" value={product.usage || "N/A"} />
-            </div>
-
-            <div className="mb-8 p-6 bg-gray-50/50 border-y border-gray-100 flex items-baseline gap-2">
-              <div className="flex items-end gap-2">
-                <span className="text-2xl font-black tracking-tighter">₹{parseFloat(product.price || '0').toFixed(2)}</span>
-                <span className="text-sm text-gray-500 font-bold mb-1">/ kg</span>
+            {/* Specifications */}
+            <div className="mb-8">
+              <h2 className="text-[11px] font-black uppercase tracking-[0.2em] text-black mb-4">Specifications</h2>
+              <div className="grid grid-cols-2 border-t border-l border-gray-100 rounded-xl overflow-hidden">
+                <SpecCell label="Fabric" value={product.fabric} />
+                <SpecCell label="Knit Style" value={product.knit_style} />
+                <SpecCell label="Content" value={product.content || product.composition} />
+                <SpecCell label="GSM" value={product.gsm && product.gsm !== "N/A" ? `${product.gsm} g/m²` : undefined} />
+                <SpecCell label="Width" value={product.width} />
+                <SpecCell label="Width Type" value={product.type} />
+                <SpecCell label="Shade" value={product.shade} />
+                <SpecCell label="Usage" value={product.usage} />
               </div>
             </div>
 
-            <Link href="/shipping-and-return-policy" className="text-[11px] font-medium text-[#57AD43] underline underline-offset-4 mb-6 block hover:text-black transition-colors">
-              Shipping calculated at checkout
-            </Link>
-
-            {/* Selection & Add to Cart */}
-            <div className="flex flex-col gap-6 pt-6 border-t border-gray-100 mb-8">
-              <div className="flex flex-row items-start gap-6 lg:gap-12">
-                <div className="flex flex-col gap-2 w-full lg:w-auto">
-                  <div className="text-[10px] font-bold text-black uppercase tracking-widest">
-                    Live Quantity
-                  </div>
-                  <div className="h-12 flex items-center justify-center min-w-[160px] px-4 text-[11px] font-bold text-[#57AD43] uppercase tracking-widest border border-[#57AD43]/30 bg-[#57AD43]/5 whitespace-nowrap">
-                    {liveQuantityText}
+            {/* Purchase Box: price + live inventory + quantity + cart */}
+            <div className="mb-10 rounded-2xl border border-gray-100 bg-gray-50/60 p-5 lg:p-7 shadow-sm">
+              <div className="flex flex-wrap items-end justify-between gap-4 pb-5 mb-5 border-b border-gray-200/70">
+                <div>
+                  <span className="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Price</span>
+                  <div className="flex items-end gap-1.5">
+                    <span className="text-3xl lg:text-4xl font-black tracking-tighter text-[#121212]">₹{parseFloat(product.price || '0').toFixed(2)}</span>
+                    <span className="text-sm text-gray-500 font-bold mb-1">/ kg</span>
                   </div>
                 </div>
-
-                <div className="flex flex-col gap-2 w-full lg:w-auto">
-                  <div className="text-[10px] font-bold text-black uppercase tracking-widest">
-                    Quantity
-                  </div>
-                  <div className="flex items-center border border-gray-200 bg-white h-12 w-fit">
-                    <button onClick={() => setQuantity(prev => Math.max(1, prev - 1))} className="w-12 h-full flex items-center justify-center hover:bg-gray-50 transition-colors border-r border-gray-200"><Minus size={14} /></button>
-                    <input type="text" value={quantity} readOnly className="w-16 h-full text-center text-sm font-bold outline-none" />
-                    <button onClick={() => setQuantity(prev => prev + 1)} className="w-12 h-full flex items-center justify-center hover:bg-gray-50 transition-colors border-l border-gray-200"><Plus size={14} /></button>
-                  </div>
+                <div className="text-right">
+                  <span className="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1.5">Live Inventory</span>
+                  {typeof stock === "number" ? (
+                    stock > 0 ? (
+                      <span className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-[#57AD43] bg-[#57AD43]/10 border border-[#57AD43]/25 px-3.5 py-2 rounded-full">
+                        <span className="relative flex h-2 w-2">
+                          <span className="absolute inline-flex h-full w-full rounded-full bg-[#57AD43] opacity-60 animate-ping" />
+                          <span className="relative inline-flex h-2 w-2 rounded-full bg-[#57AD43]" />
+                        </span>
+                        {stock} kg available
+                      </span>
+                    ) : (
+                      <span className="inline-flex text-xs font-black uppercase tracking-widest text-red-500 bg-red-50 border border-red-100 px-3.5 py-2 rounded-full">Out of stock</span>
+                    )
+                  ) : (
+                    <span className="text-xs font-bold uppercase tracking-widest text-gray-500">Check availability</span>
+                  )}
                 </div>
               </div>
 
-              <button onClick={handleAddToCart} className="w-full bg-[#121212] text-white h-14 flex items-center justify-center gap-3 !text-[14px] lg:!text-[16px] font-bold uppercase tracking-[0.2em] hover:bg-[#57AD43] transition-all duration-300 shadow-lg shadow-black/5 active:scale-[0.98]">
-                <ShoppingBag size={15} /> Add to cart
-              </button>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <div className="flex items-center justify-between border border-gray-200 bg-white h-14 rounded-xl overflow-hidden sm:w-[170px] shrink-0">
+                  <button
+                    aria-label="Decrease quantity"
+                    onClick={() => setQuantity(prev => Math.max(1, prev - 1))}
+                    className="w-12 h-full flex items-center justify-center hover:bg-gray-50 transition-colors"
+                  ><Minus size={14} /></button>
+                  <div className="flex flex-col items-center leading-none">
+                    <span className="text-base font-black">{quantity}</span>
+                    <span className="text-[9px] font-bold uppercase tracking-widest text-gray-400 mt-1">kg</span>
+                  </div>
+                  <button
+                    aria-label="Increase quantity"
+                    onClick={() => setQuantity(prev => (typeof stock === "number" && stock > 0 ? Math.min(stock, prev + 1) : prev + 1))}
+                    className="w-12 h-full flex items-center justify-center hover:bg-gray-50 transition-colors"
+                  ><Plus size={14} /></button>
+                </div>
+
+                <button
+                  onClick={handleAddToCart}
+                  disabled={stock === 0}
+                  className="flex-1 bg-[#121212] text-white h-14 rounded-xl flex items-center justify-center gap-3 !text-[14px] font-bold uppercase tracking-[0.2em] hover:bg-[#57AD43] transition-all duration-300 shadow-lg shadow-black/10 active:scale-[0.98] disabled:bg-gray-300 disabled:shadow-none disabled:cursor-not-allowed"
+                >
+                  <ShoppingBag size={16} /> {stock === 0 ? "Out of stock" : "Add to cart"}
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between mt-4 text-[11px] font-medium">
+                <span className="text-gray-500">
+                  Total: <strong className="text-black">₹{(parseFloat(product.price || '0') * quantity).toFixed(2)}</strong>
+                </span>
+                <Link href="/shipping-and-return-policy" className="text-[#57AD43] underline underline-offset-4 hover:text-black transition-colors">
+                  Shipping calculated at checkout
+                </Link>
+              </div>
             </div>
 
             {/* Info accordions */}
@@ -330,19 +384,15 @@ Minor GSM, width, and color variations may occur—acceptable as per industry st
   );
 }
 
-function SpecRow({ label, value }: { label: string, value: string }) {
-  const cleanedValue = value
-    ? value
-        .replace(/-/g, ' ')
-        .replace(/\s+/g, ' ')
-        .replace(/\s*,\s*/g, ', ')
-        .trim()
-    : value;
+function SpecCell({ label, value }: { label: string, value?: string }) {
+  const cleanedValue = value && value !== "N/A"
+    ? value.replace(/-/g, ' ').replace(/\s+/g, ' ').replace(/\s*,\s*/g, ', ').trim()
+    : "—";
 
   return (
-    <div className="flex items-baseline gap-4 text-[11px] lg:text-[12px] leading-relaxed py-1.5 border-b border-gray-50 last:border-0">
-      <span className="font-bold text-black min-w-[100px] uppercase tracking-wider shrink-0">{label}:</span>
-      <span className="text-gray-600 font-medium">{cleanedValue}</span>
+    <div className="flex flex-col gap-1 px-4 py-3.5 border-r border-b border-gray-100 bg-white">
+      <span className="text-[9px] lg:text-[10px] font-bold uppercase tracking-[0.18em] text-gray-400">{label}</span>
+      <span className="text-[12px] lg:text-[13px] font-semibold text-[#121212] uppercase tracking-wide leading-snug">{cleanedValue}</span>
     </div>
   );
 }

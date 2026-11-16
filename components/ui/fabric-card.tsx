@@ -15,11 +15,12 @@ interface FabricCardProps {
   variantId?: string;
   isNew?: boolean;
   catalogMode?: boolean;
+  inventory?: number;
 }
 
 
 
-export function FabricCard({ id, name, gsm, price, image, variantId, catalogMode }: FabricCardProps) {
+export function FabricCard({ id, name, gsm, price, image, variantId, catalogMode, inventory }: FabricCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const addItem = useCartStore((state) => state.addItem);
 
@@ -98,6 +99,23 @@ export function FabricCard({ id, name, gsm, price, image, variantId, catalogMode
           <p className="text-[10px] md:text-lg font-black text-black uppercase tracking-tighter flex items-center gap-1 md:gap-2">
             <span className="text-[#57AD43]">₹</span>{parseFloat(price).toFixed(2)} <span className="text-[8px] md:text-[12px] text-gray-500 font-bold normal-case tracking-normal">/ kg</span>
           </p>
+
+          {/* Live inventory */}
+          {typeof inventory === "number" && (
+            inventory > 0 ? (
+              <span className="inline-flex items-center gap-1.5 text-[8px] md:text-[10px] font-bold uppercase tracking-widest text-[#57AD43] bg-[#57AD43]/10 px-2.5 py-1 rounded-full">
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="absolute inline-flex h-full w-full rounded-full bg-[#57AD43] opacity-60 animate-ping" />
+                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#57AD43]" />
+                </span>
+                {inventory} kg in stock
+              </span>
+            ) : (
+              <span className="text-[8px] md:text-[10px] font-bold uppercase tracking-widest text-red-500 bg-red-50 px-2.5 py-1 rounded-full">
+                Out of stock
+              </span>
+            )
+          )}
 
           {/* Static Action Button (Mobile/Tablet Only) - Below Price */}
           <div className="w-full mt-2 lg:hidden px-2">

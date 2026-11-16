@@ -438,6 +438,7 @@ export function FabricsCatalogClient({ initialFabrics }: FabricsCatalogClientPro
                     image={fabric.image}
                     variantId={fabric.variantId}
                     catalogMode={true}
+                    inventory={fabric.totalInventory}
                   />
                 ))}
               </div>
