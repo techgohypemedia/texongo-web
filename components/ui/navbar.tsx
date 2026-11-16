@@ -27,7 +27,7 @@ const navItems = [
     ]
   },
   { name: "Blog", href: "/blog" },
-  { name: "Knit Style", href: "/fabrics" },
+  { name: "Knit Style", href: fabricCategoryHref("Knit Style") },
   { name: "About Us", href: "/about-us" },
   { name: "Contact Us", href: "/contact-us" },
 ];
@@ -313,7 +313,7 @@ export function Navbar() {
                               className={`transition-transform duration-300 ${hoveredItem === item.name ? "rotate-180" : ""}`}
                             />
                           )}
-                          <span className={`absolute bottom-[-6px] left-0 h-[2px] bg-[#57AD43] transition-all duration-500 ease-out ${pathname === item.href ? "w-full" : "w-0 group-hover:w-full"}`} />
+                          <span className={`absolute bottom-[-6px] left-0 h-[2px] bg-[#57AD43] transition-all duration-500 ease-out ${pathname === item.href.split("?")[0] ? "w-full" : "w-0 group-hover:w-full"}`} />
                         </Link>
                       )}
 
