@@ -9,6 +9,7 @@ import { usePathname } from "next/navigation";
 import { useCartStore, useAuthStore } from "@/lib/store";
 import { Fabric, mapShopifyProduct } from "@/lib/shopify";
 import { FABRICA_VISION_MENU, fabricCategoryHref } from "@/lib/fabric-navigation";
+import { createFabricSearchMatcher } from "@/lib/fabric-search";
 
 const navItems = [
   { name: "Home", href: "/" },
@@ -91,74 +92,8 @@ export function Navbar() {
   const filteredProducts = useMemo(() => {
     if (!searchQuery.trim()) return [];
 
-    const searchStr = searchQuery.toLowerCase().trim();
-    let expandedSearchStr = " " + searchStr + " ";
-    const shortcuts = [
-      { keys: ["s/j", "sj", "single jersy"], value: "single jersey" },
-      { keys: ["d/j"], value: "double jersey interlock" },
-      { keys: ["pk"], value: "pique" },
-      { keys: ["1x1 rib", "2x2 rib"], value: "rib" },
-      { keys: ["flc", "fl"], value: "fleece" },
-      { keys: ["f/t", "f. terry", "f.terry"], value: "french terry" },
-      { keys: ["d/n", "d.n"], value: "drop needle" },
-      { keys: ["jqd knit", "jqd"], value: "jacquard" },
-      { keys: ["h/comb", "hny"], value: "honeycomb" },
-      { keys: ["d/net", "msh"], value: "mesh" },
-      { keys: ["spx"], value: "spandex" },
-      { keys: ["lycra"], value: "lycra" },
-      { keys: ["ilk"], value: "interlock" },
-      { keys: ["thrm"], value: "thermal" },
-      { keys: ["rib-spx", "rib-lycra"], value: "rib spandex" },
-      { keys: ["p/r", "ponte"], value: "ponte roma" },
-      { keys: ["vlr", "velour"], value: "velour" },
-      { keys: ["jqd-flc"], value: "jacquard fleece" },
-      { keys: ["slub jy", "s/j slub"], value: "slub jersey" },
-      { keys: ["t/k", "terry"], value: "terry" },
-      { keys: ["a/s jy"], value: "auto stripe jersey" },
-      { keys: ["mlj", "mél jy", "mel jy", "m. s/j", "m.s/j"], value: "melange jersey" },
-      { keys: ["coton spandex", "cotton spandex", "cotton lycra"], value: "stretch" },
-      { keys: ["f/b rib"], value: "flat back rib" },
-      { keys: ["rice.k rib"], value: "rice knit" }
-    ];
-
-    for (const { keys, value } of shortcuts) {
-      for (const key of keys) {
-        expandedSearchStr = expandedSearchStr.replace(new RegExp(`(?<=\\s)${key.replace(/[-/\\\\^$*+?.()|[\\]{}]/g, '\\\\$&')}(?=\\s)`, 'g'), ` ${value} `);
-      }
-    }
-    expandedSearchStr = expandedSearchStr.trim().replace(/\s+/g, ' ');
-
-    const cleanSearchStr = searchStr.replace(/[^a-z0-9]/g, '');
-    const queryWords = expandedSearchStr.split(/\s+/).filter(Boolean);
-
-    return allProducts.filter((product) => {
-      // 1. Forgiving SKU Match
-      if (product.sku && product.sku !== 'N/A') {
-        const cleanSku = product.sku.toLowerCase().replace(/[^a-z0-9]/g, '');
-        if (cleanSku) {
-          if (cleanSku === cleanSearchStr || cleanSearchStr.includes(cleanSku) || cleanSku.includes(cleanSearchStr)) {
-            return true;
-          }
-          if (queryWords.some(w => cleanSku === w.replace(/[^a-z0-9]/g, ''))) {
-            return true;
-          }
-        }
-      }
-
-      // 2. Standard multi-word match
-      return queryWords.every((word) => {
-        return (
-          product.name?.toLowerCase().includes(word) ||
-          product.description?.toLowerCase().includes(word) ||
-          product.sku?.toLowerCase().includes(word) ||
-          (product.knit_style && product.knit_style !== 'N/A' && product.knit_style.toLowerCase().includes(word)) ||
-          (product.composition && product.composition !== 'N/A' && product.composition.toLowerCase().includes(word)) ||
-          (product.shade && product.shade !== 'N/A' && product.shade.toLowerCase().includes(word)) ||
-          (product.usage && product.usage !== 'N/A' && product.usage.toLowerCase().includes(word)) ||
-          (product.type && product.type !== 'N/A' && product.type.toLowerCase().includes(word))
-        );
-      });
-    });
+    const matches = createFabricSearchMatcher(searchQuery);
+    return allProducts.filter(matches);
   }, [searchQuery, allProducts]);
 
   const handleItemMouseEnter = (itemName: string) => {

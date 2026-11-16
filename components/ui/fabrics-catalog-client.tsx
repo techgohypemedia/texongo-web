@@ -4,6 +4,7 @@ import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { FabricCard } from "./fabric-card";
 import { ChevronDown, Filter, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState, useMemo, useEffect } from "react";
+import { createFabricSearchMatcher } from "@/lib/fabric-search";
 import { Fabric } from "@/lib/shopify";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -77,6 +78,7 @@ export function FabricsCatalogClient({ initialFabrics }: FabricsCatalogClientPro
 
   // Filtering & Sorting Logic
   const filteredFabrics = useMemo(() => {
+    const searchMatcher = createFabricSearchMatcher(queryParam);
     return fabrics
       .filter(f => {
         // GSM Filter Match — text input takes priority over dropdown range
@@ -237,79 +239,7 @@ export function FabricsCatalogClient({ initialFabrics }: FabricsCatalogClientPro
           }
         }
 
-        let queryMatch = true;
-        if (queryParam) {
-          const searchStr = queryParam.toLowerCase().trim();
-          
-          let expandedSearchStr = " " + searchStr + " ";
-          const shortcuts = [
-            { keys: ["s/j", "sj", "single jersy"], value: "single jersey" },
-            { keys: ["d/j"], value: "double jersey interlock" },
-            { keys: ["pk"], value: "pique" },
-            { keys: ["1x1 rib", "2x2 rib"], value: "rib" },
-            { keys: ["flc", "fl"], value: "fleece" },
-            { keys: ["f/t", "f. terry", "f.terry"], value: "french terry" },
-            { keys: ["d/n", "d.n"], value: "drop needle" },
-            { keys: ["jqd knit", "jqd"], value: "jacquard" },
-            { keys: ["h/comb", "hny"], value: "honeycomb" },
-            { keys: ["d/net", "msh"], value: "mesh" },
-            { keys: ["spx"], value: "spandex" },
-            { keys: ["lycra"], value: "lycra" },
-            { keys: ["ilk"], value: "interlock" },
-            { keys: ["thrm"], value: "thermal" },
-            { keys: ["rib-spx", "rib-lycra"], value: "rib spandex" },
-            { keys: ["p/r", "ponte"], value: "ponte roma" },
-            { keys: ["vlr", "velour"], value: "velour" },
-            { keys: ["jqd-flc"], value: "jacquard fleece" },
-            { keys: ["slub jy", "s/j slub"], value: "slub jersey" },
-            { keys: ["t/k", "terry"], value: "terry" },
-            { keys: ["a/s jy"], value: "auto stripe jersey" },
-            { keys: ["mlj", "mél jy", "mel jy", "m. s/j", "m.s/j"], value: "melange jersey" },
-            { keys: ["coton spandex", "cotton spandex", "cotton lycra"], value: "stretch" },
-            { keys: ["f/b rib"], value: "flat back rib" },
-            { keys: ["rice.k rib"], value: "rice knit" }
-          ];
-
-          for (const { keys, value } of shortcuts) {
-            for (const key of keys) {
-              expandedSearchStr = expandedSearchStr.replace(new RegExp(`(?<=\\s)${key.replace(/[-/\\\\^$*+?.()|[\\]{}]/g, '\\\\$&')}(?=\\s)`, 'g'), ` ${value} `);
-            }
-          }
-          expandedSearchStr = expandedSearchStr.trim().replace(/\s+/g, ' ');
-
-          const cleanSearchStr = searchStr.replace(/[^a-z0-9]/g, '');
-          const queryWords = expandedSearchStr.split(/\s+/).filter(Boolean);
-          
-          let exactSkuMatch = false;
-          if (f.sku && f.sku !== 'N/A') {
-            const cleanSku = f.sku.toLowerCase().replace(/[^a-z0-9]/g, '');
-            if (cleanSku) {
-              if (cleanSku === cleanSearchStr || cleanSearchStr.includes(cleanSku) || cleanSku.includes(cleanSearchStr)) {
-                exactSkuMatch = true;
-              }
-              if (queryWords.some(w => cleanSku === w.replace(/[^a-z0-9]/g, ''))) {
-                exactSkuMatch = true;
-              }
-            }
-          }
-
-          if (exactSkuMatch) {
-            queryMatch = true;
-          } else {
-            queryMatch = queryWords.every((word) => {
-              return (
-                f.name?.toLowerCase().includes(word) ||
-                f.description?.toLowerCase().includes(word) ||
-                f.sku?.toLowerCase().includes(word) ||
-                (f.knit_style && f.knit_style !== 'N/A' && f.knit_style.toLowerCase().includes(word)) ||
-                (f.composition && f.composition !== 'N/A' && f.composition.toLowerCase().includes(word)) ||
-                (f.shade && f.shade !== 'N/A' && f.shade.toLowerCase().includes(word)) ||
-                (f.usage && f.usage !== 'N/A' && f.usage.toLowerCase().includes(word)) ||
-                (f.type && f.type !== 'N/A' && f.type.toLowerCase().includes(word))
-              );
-            });
-          }
-        }
+        const queryMatch = searchMatcher(f);
 
         return gsmMatch && colorMatch && categoryMatch && queryMatch;
       })

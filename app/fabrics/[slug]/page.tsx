@@ -210,6 +210,18 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
               <h1 className="!text-[24px] font-bold uppercase text-[#121212] tracking-tight">{product.name}</h1>
             </div>
 
+            {/* Specifications Table */}
+            <div className="space-y-1 mb-8">
+              <SpecRow label="FABRIC" value={product.fabric || "N/A"} />
+              <SpecRow label="KNIT STYLE" value={product.knit_style || "N/A"} />
+              <SpecRow label="CONTENT" value={product.content || product.composition || "N/A"} />
+              <SpecRow label="GSM" value={product.gsm === "N/A" ? "N/A" : `${product.gsm} g/m²`} />
+              <SpecRow label="WIDTH" value={product.width !== "N/A" ? `${product.width}` : "N/A"} />
+              <SpecRow label="WIDTH TYPE" value={product.type || "N/A"} />
+              <SpecRow label="SHADE" value={product.shade || "N/A"} />
+              <SpecRow label="USAGE" value={product.usage || "N/A"} />
+            </div>
+
             <div className="mb-8 p-6 bg-gray-50/50 border-y border-gray-100 flex items-baseline gap-2">
               <div className="flex items-end gap-2">
                 <span className="text-2xl font-black tracking-tighter">₹{parseFloat(product.price || '0').toFixed(2)}</span>
@@ -250,21 +262,9 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
               </button>
             </div>
 
-            {/* Specifications Table */}
-            <div className="space-y-1 border-t border-gray-100 pt-6 mb-8">
-              <SpecRow label="FABRIC" value={product.fabric || "N/A"} />
-              <SpecRow label="KNIT STYLE" value={product.knit_style || "N/A"} />
-              <SpecRow label="CONTENT" value={product.content || product.composition || "N/A"} />
-              <SpecRow label="GSM" value={product.gsm === "N/A" ? "N/A" : `${product.gsm} g/m²`} />
-              <SpecRow label="WIDTH" value={product.width !== "N/A" ? `${product.width}` : "N/A"} />
-              <SpecRow label="WIDTH TYPE" value={product.type || "N/A"} />
-              <SpecRow label="LIVE QUANTITY" value={liveQuantityText} />
-              <SpecRow label="SHADE" value={product.shade || "N/A"} />
-              <SpecRow label="USAGE" value={product.usage || "N/A"} />
-            </div>
-
-            {/* Accordions moved up */}
+            {/* Info accordions */}
             <div className="border-t border-gray-100 divide-y divide-gray-100 mb-8">
+              <AccordionItem title="Description" content={product.description || "No description available."} defaultOpen />
               <AccordionItem title="Note" content={
                 <ul className="space-y-2 list-disc ml-4">
                   <li><strong>COLOR:</strong> Please note that color difference on website may vary due to lighting and environmental factors.</li>
@@ -272,7 +272,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
                   <li><strong>Width Tolerance:</strong> ±5% variation up and down from specified width is standard in knitted fabrics and not a defect.</li>
                   <li><strong>Blends:</strong> Fabric compositions mentioned on our website are approximate and may vary , as not all fabrics undergo detailed composition testing.</li>
                 </ul>
-              } defaultOpen />
+              } />
               <AccordionItem title="Queries" content={
                 <div className="space-y-4">
                   <p className="text-gray-700 leading-loose">
@@ -302,16 +302,6 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
               <AccordionItem title="Care Info" content="Hand wash or dry clean preferred; machine wash on mild cycle. Test before full wash.
 Minor GSM, width, and color variations may occur—acceptable as per industry standards." />
             </div>
-          </div>
-        </div>
-
-        {/* Description Section */}
-        <div className="mt-10 lg:mt-32 border-t border-gray-100 pt-8 lg:pt-16 mb-12 lg:mb-32">
-          <h2 className="text-[11px] font-bold uppercase tracking-[0.2em] text-center mb-8 text-black">
-            Description
-          </h2>
-          <div className="max-w-4xl mx-auto px-6 text-gray-600 leading-relaxed text-center italic text-sm">
-            {product.description || "No description available."}
           </div>
         </div>
 
