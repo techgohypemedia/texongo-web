@@ -9,7 +9,13 @@
 # After setup, redeploy any time with:  texongo-deploy
 set -euo pipefail
 
-: "${DOMAIN:?Set DOMAIN, e.g. DOMAIN=texongo.com}"
+: "${DOMAIN:?Set DOMAIN, e.g. DOMAIN=texongo.com or DOMAIN='texongo.com texongo.in'}"
+# DOMAIN may list several domains (space or comma separated); the first is the primary URL.
+read -r -a DOMAINS <<< "${DOMAIN//,/ }"
+PRIMARY="${DOMAINS[0]}"
+SITE_ADDRS=""
+for d in "${DOMAINS[@]}"; do SITE_ADDRS+="${d}, www.${d}, "; done
+SITE_ADDRS="${SITE_ADDRS%, }"
 REPO_URL="${REPO_URL:-https://github.com/techgohypemedia/texongo-web.git}"
 BRANCH="${BRANCH:-main}"
 APP_DIR="${APP_DIR:-/var/www/texongo-web}"
@@ -68,7 +74,7 @@ fi
 [ -f "$APP_DIR/.env" ] || { echo "No .env found and ENV_B64 not given"; exit 1; }
 # Point the public app URL at the real domain (drop any old/duplicate entries)
 sed -i '/^NEXT_PUBLIC_APP_URL=/d' "$APP_DIR/.env"
-echo "NEXT_PUBLIC_APP_URL=https://${DOMAIN}" >> "$APP_DIR/.env"
+echo "NEXT_PUBLIC_APP_URL=https://${PRIMARY}" >> "$APP_DIR/.env"
 grep -q '^NODE_ENV=' "$APP_DIR/.env" || echo "NODE_ENV=production" >> "$APP_DIR/.env"
 cp "$APP_DIR/.env" /root/texongo.env.backup && chmod 600 /root/texongo.env.backup
 chmod 600 "$APP_DIR/.env"
@@ -100,15 +106,11 @@ systemctl daemon-reload
 systemctl enable texongo >/dev/null
 systemctl restart texongo
 
-log "Caddy site config for ${DOMAIN}"
+log "Caddy site config for: ${SITE_ADDRS}"
 cat > /etc/caddy/Caddyfile <<EOF
-${DOMAIN} {
+${SITE_ADDRS} {
     encode zstd gzip
     reverse_proxy 127.0.0.1:${APP_PORT}
-}
-
-www.${DOMAIN} {
-    redir https://${DOMAIN}{uri} permanent
 }
 EOF
 systemctl enable caddy >/dev/null
@@ -136,12 +138,12 @@ cat <<EOF
  App status : ${STATUS}
  Server IP  : ${IP}
 
- DNS (at your domain registrar):
+ DNS (at your registrar, for EACH of: ${DOMAINS[*]}):
    A   @     -> ${IP}
    A   www   -> ${IP}
 
  HTTPS is issued automatically by Caddy as soon as DNS points here.
- Site: https://${DOMAIN}
+ Sites: ${SITE_ADDRS}
 
  Useful:
    texongo-deploy               # pull latest from GitHub + rebuild + restart
