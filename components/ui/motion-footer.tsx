@@ -4,6 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Mail, Phone, MapPin } from "lucide-react";
+import { SOCIAL_LINKS } from "@/lib/social-links";
 
 export function MotionFooter() {
   return (
@@ -90,9 +91,14 @@ export function MotionFooter() {
         <div>
           <h4 className="text-white font-bold text-sm mb-6">Follow Us</h4>
           <ul className="space-y-3">
-            <li><a href="#" className="text-white/60 text-sm hover:text-white transition-colors">Facebook</a></li>
-            <li><a href="#" className="text-white/60 text-sm hover:text-white transition-colors">Instagram</a></li>
-            <li><a href="#" className="text-white/60 text-sm hover:text-white transition-colors">LinkedIn</a></li>
+            {SOCIAL_LINKS.map(({ name, href, Icon }) => (
+              <li key={name}>
+                <a href={href} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-3 text-white/60 text-sm hover:text-white transition-colors">
+                  <Icon size={14} />
+                  {name}
+                </a>
+              </li>
+            ))}
           </ul>
         </div>
       </div>

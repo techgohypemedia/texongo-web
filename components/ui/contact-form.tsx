@@ -4,6 +4,7 @@ import { Mail, Globe, Phone, MapPin, Loader2, CheckCircle2, AlertCircle } from "
 import { sendContactEmail } from "../../app/actions/send-email";
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
+import { SOCIAL_LINKS } from "@/lib/social-links";
 
 export function ContactForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -161,6 +162,23 @@ export function ContactForm() {
               </motion.div>
               <motion.div {...fadeIn} transition={{ delay: 0.4 }}>
                 <ContactInfoItem icon={<MapPin size={22} />} label="Location" value="D 10/1, Pocket D, Okhla Industrial Area Phase II, New Delhi, Delhi 110020" />
+              </motion.div>
+              <motion.div {...fadeIn} transition={{ delay: 0.5 }} className="pt-2">
+                <span className="block text-[10px] font-black uppercase tracking-[0.2em] text-white/60 mb-3 text-center md:text-left">Follow Us</span>
+                <div className="flex gap-3 justify-center md:justify-start">
+                  {SOCIAL_LINKS.map(({ name, href, Icon }) => (
+                    <a
+                      key={name}
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`Texongo on ${name}`}
+                      className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white/10 text-white border border-white/5 backdrop-blur-sm hover:bg-white hover:text-[#57AD43] hover:scale-110 transition-all duration-500"
+                    >
+                      <Icon size={18} />
+                    </a>
+                  ))}
+                </div>
               </motion.div>
             </div>
           </div>

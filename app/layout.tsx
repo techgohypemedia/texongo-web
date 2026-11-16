@@ -6,6 +6,16 @@ import { CartDrawer } from "@/components/ui/cart-drawer";
 import { Preloader } from "../components/ui/preloader";
 import { SmoothScroll } from "../components/ui/smooth-scroll";
 import { Analytics } from "@/components/analytics";
+import { SOCIAL_LINKS } from "@/lib/social-links";
+
+const organizationJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "Texongo Fabrics",
+  url: "https://texongo.com",
+  logo: "https://texongo.com/logos/logo.png",
+  sameAs: SOCIAL_LINKS.map((s) => s.href),
+};
 
 export const metadata: Metadata = {
   title: "Texongo Fabrics",
@@ -23,6 +33,10 @@ export default function RootLayout({
         className="min-h-screen bg-[#F9FAFB] text-[#111111] antialiased"
         suppressHydrationWarning
       >
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        />
         <SmoothScroll />
         <Preloader />
         <Navbar />
